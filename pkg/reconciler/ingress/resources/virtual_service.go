@@ -113,14 +113,40 @@ func MakeMeshVirtualService(ia v1alpha1.IngressAccessor) *v1alpha3.VirtualServic
 func MakeVirtualServices(ia v1alpha1.IngressAccessor, gateways map[v1alpha1.IngressVisibility]sets.String) ([]*v1alpha3.VirtualService, error) {
 	vss := []*v1alpha3.VirtualService{MakeMeshVirtualService(ia)}
 
-	requiredGatewayCount := 0
-	if len(getPublicIngressRules(ia)) > 0 {
-		requiredGatewayCount += gateways[v1alpha1.IngressVisibilityExternalIP].Len()
-	}
+	// !!!!!!-------------------------WARNING-------------------------!!!!!!
+	// THIS IS A TEMPORARY OVERRIDE TO SUPPORT CUSTOM GATEWAYS PER SERVICE.
+	// We are overriding the Knative logic of populating gateways in its virtual service. This is until Knative
+	// supports splitting gateways per service as tracked by this PR (https://github.com/knative/serving/pull/4909).
+	// Contact Chris Sherry(chsherry), Joon Lee(joonlee), Rakesh Kelkar(rakelkar) for any related questions.
+	//
+	// ------ Overriding Changes
+	// Virtual services will reference a single custom gateway with the name format of
+	// {service-name}-gateway. This expects the gateway to be deployed at the namespace of the service.
+	// Thus, the QualifiedName of the gateway is {namespace}/{service-name}-gateway.
+	// The custom gateway CRD is created by our servicegateway controller not Knative. For details on controller,
+	// refer to https://msdata.visualstudio.com/Vienna/_git/mir-instances?path=%2FREADME.md&version=GBmaster
+	// !!!!!!---------------------------------------------------------!!!!!!
 
-	if len(getClusterLocalIngressRules(ia)) > 0 {
-		requiredGatewayCount += gateways[v1alpha1.IngressVisibilityClusterLocal].Len()
-	}
+	//// Original Knative logic commented out
+	// requiredGatewayCount := 0
+	// if len(getPublicIngressRules(ia)) > 0 {
+	// 	requiredGatewayCount += gateways[v1alpha1.IngressVisibilityExternalIP].Len()
+	// }
+
+	// if len(getClusterLocalIngressRules(ia)) > 0 {
+	// 	requiredGatewayCount += gateways[v1alpha1.IngressVisibilityClusterLocal].Len()
+	// }
+
+	//// Overriding custom logic
+	requiredGatewayCount := 1
+	customPublicGateways := sets.NewString()
+	// Gateway qualified name is {namespace}/{service-name}-gateway
+	customGatewayQualifiedName := VirtualServiceNamespace(ia) + "/" + names.IngressVirtualService(ia) + "-gateway"
+	customPublicGateways.Insert(customGatewayQualifiedName)
+	// Override the Knative deafult public gateway to the custom gateway
+	gateways[v1alpha1.IngressVisibilityExternalIP] = customPublicGateways
+	// Delete the Knative deafult private gateway
+	delete(gateways, v1alpha1.IngressVisibilityClusterLocal)
 
 	if requiredGatewayCount > 0 {
 		vss = append(vss, MakeIngressVirtualService(ia, gateways))
