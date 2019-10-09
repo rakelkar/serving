@@ -17,20 +17,20 @@ jobs:
   - bash: |
       go get github.com/google/ko/cmd/ko
     displayName: Get KO
-    workingDirectory: $(repo.path)
+    # workingDirectory: $(repo.path)
   - bash: |
       wget -O azcopy.tar.gz https://aka.ms/downloadazcopy-v10-linux
       tar -xf azcopy.tar.gz
       cp azcopy_linux_amd64_10.2.1/azcopy /usr/sbin/azcopy
       chmod +x /usr/sbin/azcopy
     displayName: Get AZCOPY
-    workingDirectory: $(repo.path)
+    # workingDirectory: $(repo.path)
   - bash: |
       ./hack/release.sh --test-args "--unit-tests" --release-acr rakelkartest --release-azblob https://kntestblob.blob.core.windows.net/knt1 --publish --tag-release
       docker save -o $(repo.path)/_output/release-images/amd64/metrics-server-amd64.tar ${PREFIX}/metrics-server-amd64:${VERSION}
       rm -rf $(repo.path)/vendor
     displayName: Build image and save to $(repo.path)/_output/release-images/amd64
-    workingDirectory: $(repo.path)
+    # workingDirectory: $(repo.path)
     env:
       PREFIX: $(registry.url)/$(registry.repo)
       VERSION: $(checkout.branch)
