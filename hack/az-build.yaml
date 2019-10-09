@@ -10,10 +10,10 @@ jobs:
     GOPATH: $(System.DefaultWorkingDirectory)/go
     repo.path: $(GOPATH)/src/knative.dev/serving
   steps:
-  - bash: |
-      git clone -b $(checkout.branch) $(checkout.repo) $(repo.path) && \
-      mkdir -p $(repo.path)/_output/release-images/amd64
-    displayName: Checkout $(checkout.repo) @ $(checkout.branch)
+  # - bash: |
+  #     git clone -b $(checkout.branch) $(checkout.repo) $(repo.path) && \
+  #     mkdir -p $(repo.path)/_output/release-images/amd64
+  #   displayName: Checkout $(checkout.repo) @ $(checkout.branch)
   - bash: |
       go get github.com/google/ko/cmd/ko
     displayName: Get KO
