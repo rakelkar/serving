@@ -53,11 +53,11 @@ jobs:
     workingDirectory: '$(modulePath)'
     displayName: 'Get dependencies'
   - bash: |
-      $(modulePath)/hack/release.sh --test-args "--unit-tests" --release-acr rakelkartest --release-azblob https://kntestblob.blob.core.windows.net/knt1 --publish --tag-release
+      ./hack/release.sh --test-args "--unit-tests" --release-acr rakelkartest --release-azblob https://kntestblob.blob.core.windows.net/knt1 --publish --tag-release
       docker save -o $(repo.path)/_output/release-images/amd64/metrics-server-amd64.tar ${PREFIX}/metrics-server-amd64:${VERSION}
       rm -rf $(repo.path)/vendor
-    displayName: Build image and save to $(repo.path)/_output/release-images/amd64
-    # workingDirectory: $(repo.path)
+    displayName: Hack Release Build
+    workingDirectory: '$(modulePath)'
     env:
       PREFIX: $(registry.url)/$(registry.repo)
       VERSION: $(checkout.branch)
