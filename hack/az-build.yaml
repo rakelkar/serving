@@ -13,9 +13,9 @@ jobs:
       # repo.path: $(GOPATH)/src/knative.dev/serving
   steps:
   - task: GoTool@0
-    displayName: 'Use Go 1.11.12'
+    displayName: 'Use Go 1.13'
     inputs:
-      version: '1.11.12'
+      version: '1.13'
       goPath: '$(GOPATH)'
       goBin: '$(GOBIN)'
   - script: |
