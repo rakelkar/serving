@@ -50,10 +50,10 @@ jobs:
       if [ -f Gopkg.toml ]; then
           echo "dep ensure"
       fi
-    #workingDirectory: '$(controllerPath)'
+    workingDirectory: '$(modulePath)'
     displayName: 'Get dependencies'
   - bash: |
-      ./hack/release.sh --test-args "--unit-tests" --release-acr rakelkartest --release-azblob https://kntestblob.blob.core.windows.net/knt1 --publish --tag-release
+      $(modulePath)/hack/release.sh --test-args "--unit-tests" --release-acr rakelkartest --release-azblob https://kntestblob.blob.core.windows.net/knt1 --publish --tag-release
       docker save -o $(repo.path)/_output/release-images/amd64/metrics-server-amd64.tar ${PREFIX}/metrics-server-amd64:${VERSION}
       rm -rf $(repo.path)/vendor
     displayName: Build image and save to $(repo.path)/_output/release-images/amd64
