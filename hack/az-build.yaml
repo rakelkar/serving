@@ -10,10 +10,28 @@ jobs:
     GOPATH: $(System.DefaultWorkingDirectory)/go
     repo.path: $(GOPATH)/src/knative.dev/serving
   steps:
-  # - bash: |
-  #     git clone -b $(checkout.branch) $(checkout.repo) $(repo.path) && \
-  #     mkdir -p $(repo.path)/_output/release-images/amd64
-  #   displayName: Checkout $(checkout.repo) @ $(checkout.branch)
+  - task: GoTool@0
+    displayName: 'Use Go 1.11.12'
+    inputs:
+      version: '1.11.12'
+      goPath: '$(GOPATH)'
+      goBin: '$(GOBIN)'
+  - script: |
+      mkdir -p '$(GOBIN)'
+      mkdir -p '$(GOPATH)/pkg'
+      mkdir -p '$(modulePath)'
+      shopt -s extglob
+      mv !(gopath) '$(modulePath)'
+      echo '##vso[task.prependpath]$(GOBIN)'
+      echo '##vso[task.prependpath]$(GOROOT)/bin'
+      go env
+    displayName: 'Set up the Go workspace'
+
+  - task: Bash@3
+    displayName: 'Setup GO tools'
+    inputs:
+      targetType: filePath
+      filePath: './hack/go-tools-setup.sh'
   - bash: |
       go get github.com/google/ko/cmd/ko
     displayName: Get KO
