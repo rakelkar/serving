@@ -43,6 +43,13 @@ jobs:
       chmod +x ${AGENT_TOOLSDIRECTORY}/azcopy
     displayName: Get AZCOPY
     # workingDirectory: $(repo.path)
+  - script: |
+      go get -v -t -d ./...
+      if [ -f Gopkg.toml ]; then
+          echo "dep ensure"
+      fi
+    #workingDirectory: '$(controllerPath)'
+    displayName: 'Get dependencies'
   - bash: |
       ./hack/release.sh --test-args "--unit-tests" --release-acr rakelkartest --release-azblob https://kntestblob.blob.core.windows.net/knt1 --publish --tag-release
       docker save -o $(repo.path)/_output/release-images/amd64/metrics-server-amd64.tar ${PREFIX}/metrics-server-amd64:${VERSION}
