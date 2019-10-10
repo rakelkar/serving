@@ -10,7 +10,7 @@ jobs:
     GOPATH: $(System.DefaultWorkingDirectory)/go
     GOBIN: '$(GOPATH)/bin' # Go binaries path
     modulePath: '$(GOPATH)/src/$(build.repository.name)' # Path to repo
-      # repo.path: $(GOPATH)/src/knative.dev/serving
+    repo.path: $(modulePath)
   steps:
   - task: GoTool@0
     displayName: 'Use Go 1.13'
