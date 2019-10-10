@@ -9,7 +9,8 @@ jobs:
   variables:
     GOPATH: $(System.DefaultWorkingDirectory)/go
     GOBIN: '$(GOPATH)/bin' # Go binaries path
-    # repo.path: $(GOPATH)/src/knative.dev/serving
+    modulePath: '$(GOPATH)/src/$(build.repository.name)' # Path to repo
+      # repo.path: $(GOPATH)/src/knative.dev/serving
   steps:
   - task: GoTool@0
     displayName: 'Use Go 1.11.12'
@@ -32,7 +33,7 @@ jobs:
     displayName: 'Setup GO tools'
     inputs:
       targetType: filePath
-      filePath: './hack/az-go-tools-setup.sh'
+      filePath: '$(modulePath)/hack/az-go-tools-setup.sh'
   - bash: |
       go get github.com/google/ko/cmd/ko
     displayName: Get KO
